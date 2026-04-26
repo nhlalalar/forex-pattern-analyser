@@ -20,7 +20,7 @@ import { Badge, biasToBadgeVariant, confidenceToBadgeVariant, categoryToBadgeVar
 
 import { SignalCard } from "./SignalCard";
 import { SessionsPanel } from "./SessionsPanel";
-import { HistoricalLevels } from "./HistoricalLevels";
+import { MarketContext } from "./MarketContext";
 import { cn } from "@/lib/utils";
 
 interface AnalysisResultsProps {
@@ -123,8 +123,8 @@ export function AnalysisResults({ result }: AnalysisResultsProps) {
       {/* Sessions */}
       <SessionsPanel />
 
-      {/* Historical Levels — only if a pair is known */}
-      {result.pair && <HistoricalLevels pair={result.pair} />}
+      {/* Historical context with live data — only if a pair is known */}
+      {result.pair && <MarketContext symbol={result.pair} />}
 
       {/* Plain English Summary */}
       <Section title="Chart Summary" icon={FileText}>

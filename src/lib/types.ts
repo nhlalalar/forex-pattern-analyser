@@ -112,9 +112,46 @@ export const FOREX_PAIRS = [
   "USD/CHF",
   "GBP/JPY",
   "EUR/JPY",
+  "XAU/USD",
+  "WTI/USD",
+  "BTC/USD",
+  "NASDAQ",
 ] as const;
 
 export type ForexPair = typeof FOREX_PAIRS[number];
+
+// Historical data types
+export interface OHLCBar {
+  timestamp: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume?: number;
+}
+
+export interface HistoricalDataResult {
+  symbol: string;
+  currency: string;
+  bars: OHLCBar[];
+  allTimeHigh: number;
+  allTimeLow: number;
+  firstClose: number;
+  latestClose: number;
+  changeFromFirst: number;       // % change from 2017 open
+  trend1Y: "Bullish" | "Bearish" | "Neutral";
+  trend3Y: "Bullish" | "Bearish" | "Neutral";
+  keyLevels: ComputedKeyLevel[];
+  fetchedAt: string;
+  error?: string;
+}
+
+export interface ComputedKeyLevel {
+  price: number;
+  label: string;
+  type: "Support" | "Resistance" | "ATH" | "ATL" | "Psychological";
+  significance: "High" | "Medium";
+}
 
 export const TRADING_SESSIONS: TradingSession[] = [
   {
@@ -270,6 +307,66 @@ export const PAIR_PROFILES: Record<string, PairProfile> = {
       { price: "160.00", label: "Key Support Zone", type: "Support", significance: "High" },
       { price: "155.00", label: "Major Support", type: "Support", significance: "High" },
       { price: "150.00", label: "Psychological Level", type: "Psychological", significance: "Medium" },
+    ],
+  },
+  "XAU/USD": {
+    pair: "XAU/USD",
+    avgDailyRangePips: 300,
+    character: "Gold is driven by real interest rates, USD strength, and geopolitical risk. The ultimate safe-haven. Inverse correlation with DXY. Institutional favourite.",
+    bestSessions: ["London", "New York"],
+    volatility: "Medium",
+    spreadNote: "Moderate spreads. Most active during London/NY overlap.",
+    historicalLevels: [
+      { price: "2700", label: "Recent ATH Zone", type: "Resistance", significance: "High" },
+      { price: "2500", label: "Key Resistance", type: "Resistance", significance: "High" },
+      { price: "2300", label: "Previous Breakout Level", type: "Key Level", significance: "High" },
+      { price: "2000", label: "Psychological Level", type: "Psychological", significance: "High" },
+      { price: "1800", label: "Multi-Year Support", type: "Support", significance: "High" },
+    ],
+  },
+  "WTI/USD": {
+    pair: "WTI/USD",
+    avgDailyRangePips: 200,
+    character: "WTI Crude Oil is driven by OPEC+ supply decisions, US inventory data, global demand, and geopolitical events. Highly news-sensitive.",
+    bestSessions: ["London", "New York"],
+    volatility: "High",
+    spreadNote: "Wider spreads than forex. Gaps on OPEC and inventory news.",
+    historicalLevels: [
+      { price: "90.00", label: "Key Resistance Zone", type: "Resistance", significance: "High" },
+      { price: "80.00", label: "Psychological Level", type: "Psychological", significance: "High" },
+      { price: "70.00", label: "Key Support Zone", type: "Support", significance: "High" },
+      { price: "60.00", label: "Major Support", type: "Support", significance: "High" },
+      { price: "50.00", label: "Psychological Level", type: "Psychological", significance: "Medium" },
+    ],
+  },
+  "BTC/USD": {
+    pair: "BTC/USD",
+    avgDailyRangePips: 2000,
+    character: "Bitcoin trades 24/7 with extreme volatility. Driven by macro sentiment, halving cycles, ETF flows, regulatory news, and retail speculation.",
+    bestSessions: ["New York", "London"],
+    volatility: "High",
+    spreadNote: "Wide spreads during volatile moves. Liquidity thins on weekends.",
+    historicalLevels: [
+      { price: "100000", label: "Psychological ATH Zone", type: "Psychological", significance: "High" },
+      { price: "70000", label: "Previous ATH (2021)", type: "Resistance", significance: "High" },
+      { price: "50000", label: "Key Psychological Level", type: "Psychological", significance: "High" },
+      { price: "30000", label: "Major Support Zone", type: "Support", significance: "High" },
+      { price: "20000", label: "2017 ATH / Key Support", type: "Key Level", significance: "High" },
+    ],
+  },
+  "NASDAQ": {
+    pair: "NASDAQ",
+    avgDailyRangePips: 250,
+    character: "The NASDAQ 100 is dominated by mega-cap tech. Highly sensitive to Fed rate decisions, earnings results, and tech sector sentiment. Trades during NY session primarily.",
+    bestSessions: ["New York"],
+    volatility: "High",
+    spreadNote: "Moderate CFD spreads. Gaps at market open are common.",
+    historicalLevels: [
+      { price: "22000", label: "Recent ATH Zone", type: "Resistance", significance: "High" },
+      { price: "20000", label: "Psychological Level", type: "Psychological", significance: "High" },
+      { price: "18000", label: "Key Support Zone", type: "Support", significance: "High" },
+      { price: "16000", label: "Previous ATH (2021)", type: "Key Level", significance: "High" },
+      { price: "12000", label: "Major Support", type: "Support", significance: "High" },
     ],
   },
 };
