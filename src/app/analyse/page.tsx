@@ -33,19 +33,35 @@ function AnalysePage() {
     setLoading(true);
     setResult(null);
     try {
-      const body: Record<string, string> = { mode: tab };
-      if (tab === "pair" && selectedPair) body.pair = selectedPair;
-      if (tab === "upload" && previewUrl) body.imageUrl = previewUrl;
+      // Build base payload
+      const payload: Record<string, string> = { mode: tab };
+      if (tab === "pair" && selectedPair) payload.pair = selectedPair;
+
+      // Convert uploaded image to base64 so the server can send it to Claude Vision
+      if (tab === "upload" && selectedFile) {
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const result = reader.result as string;
+            // Strip the data URL prefix (data:image/jpeg;base64,)
+            resolve(result.split(",")[1]);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(selectedFile);
+        });
+        payload.imageBase64 = base64;
+        payload.imageMediaType = selectedFile.type || "image/jpeg";
+      }
 
       const res = await fetch("/api/analyse", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify(payload),
       });
       const data: AnalysisResult = await res.json();
       setResult(data);
     } catch {
-      // fallback
+      // silent fallback — server will return mock data on error
     } finally {
       setLoading(false);
     }
@@ -62,7 +78,7 @@ function AnalysePage() {
     <div className="flex flex-col min-h-full bg-grid">
       <Header
         title="Analyse"
-        subtitle="Upload a chart or select a currency pair for educational pattern analysis"
+        subtitle="Upload a chart screenshot — Claude AI will read it and generate real analysis"
       />
 
       <div className="flex-1 px-4 lg:px-6 py-6 max-w-6xl mx-auto w-full">
@@ -141,7 +157,7 @@ function AnalysePage() {
                   <span className="text-sm font-semibold text-blue-400">Scanning chart structure…</span>
                 </div>
                 <div className="space-y-2">
-                  {["Identifying trend direction", "Detecting pattern candidates", "Mapping support and resistance", "Building educational summary"].map((step, i) => (
+                  {["Sending chart to Claude AI Vision", "Detecting trend and structure", "Identifying entry, SL and TP levels", "Building pattern analysis report"].map((step, i) => (
                     <div key={i} className="flex items-center gap-2 text-xs text-slate-500">
                       <div className="w-1.5 h-1.5 rounded-full bg-blue-400/50" style={{ animationDelay: `${i * 0.2}s` }} />
                       {step}
